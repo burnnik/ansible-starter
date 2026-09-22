@@ -1,7 +1,9 @@
 # Minimal Ansible project to demonstrate typical directory structure
-Test
+#testing
 ```shell
+
 .
+#test
 ├── README.md
 ├── ansible.cfg
 ├── inventory
@@ -20,5 +22,4 @@ Test
     ├── templates
     ├── zos_ping.yml
     └── zosmf_query_datasets.yml
-Test
 ```
