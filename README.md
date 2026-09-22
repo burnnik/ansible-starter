@@ -1,5 +1,4 @@
 # Minimal Ansible project to demonstrate typical directory structure
-#testing
 ```shell
 
 .
