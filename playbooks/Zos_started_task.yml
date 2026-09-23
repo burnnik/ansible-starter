@@ -20,6 +20,6 @@
             | list
           }}
 
-    - name: Display result
+    - name: Display unique started tasks
       debug:
-        msg: "{{ started_tasks | map(attribute='job_name') | list }}" 
+        msg: "{{ started_tasks | map(attribute='job_name') | unique | list }}"
