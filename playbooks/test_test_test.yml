@@ -36,16 +36,16 @@
           z/OS SYSTEM HEALTH
 
           SYSTEM
-          System Name : ZOSLAB1
+          System Name       : ZOSLAB1
 
           SERVICES
-          TCPIP       : {{ 'RUNNING' if 'TCPIP' in running_stcs else 'NOT RUNNING' }}
-          RACF        : {{ 'RUNNING' if 'RACF' in running_stcs else 'NOT RUNNING' }}
-          PAGENT      : {{ 'RUNNING' if 'PAGENT' in running_stcs else 'NOT RUNNING' }}
-          TN3270      : {{ 'RUNNING' if 'TN3270' in running_stcs else 'NOT RUNNING' }}
-          SDSF        : {{ 'RUNNING' if 'SDSF' in running_stcs else 'NOT RUNNING' }}
-          DBB         : {{ 'RUNNING' if 'DBB' in running_stcs else 'NOT RUNNING' }}
-          CICSTS61    : {{ 'RUNNING' if 'CICSTS61' in running_stcs else 'NOT RUNNING' }}
+          TCPIP             : {{ 'RUNNING' if 'TCPIP' in running_stcs else 'NOT RUNNING' }}
+          RACF              : {{ 'RUNNING' if 'RACF' in running_stcs else 'NOT RUNNING' }}
+          PAGENT            : {{ 'RUNNING' if 'PAGENT' in running_stcs else 'NOT RUNNING' }}
+          TN3270            : {{ 'RUNNING' if 'TN3270' in running_stcs else 'NOT RUNNING' }}
+          SDSF              : {{ 'RUNNING' if 'SDSF' in running_stcs else 'NOT RUNNING' }}
+          DBB               : {{ 'RUNNING' if 'DBB' in running_stcs else 'NOT RUNNING' }}
+          CICSTS61          : {{ 'RUNNING' if 'CICSTS61' in running_stcs else 'NOT RUNNING' }}
 
           STARTED TASKS
           Total Active STCs : {{ running_stcs | length }}
