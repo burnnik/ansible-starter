@@ -1,15 +1,16 @@
+---
 - name: Gather z/OS facts
   hosts: zos
   gather_facts: false
   environment: "{{ environment_vars }}"
 
   tasks:
-- name: Display all started tasks.
-  ibm.ibm_zos_core.zos_started_task:
-    state: "displayed"
-    job_name: "all"
-  register: started_tasks
+    - name: Display all started tasks
+      ibm.ibm_zos_core.zos_started_task:
+        state: "displayed"
+        job_name: "all"
+      register: started_tasks
 
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: started_tasks
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: started_tasks
