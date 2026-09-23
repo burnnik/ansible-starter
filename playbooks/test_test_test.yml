@@ -20,6 +20,16 @@
             | list
           }}
 
+    - name: Create list of running started tasks
+      ansible.builtin.set_fact:
+        running_stcs: >-
+          {{
+            started_tasks
+            | map(attribute='job_name')
+            | unique
+            | list
+          }}
+
     - name: Display z/OS dashboard
       ansible.builtin.debug:
         msg: |
@@ -28,16 +38,16 @@
 
           SERVICES
           --------
-          TCPIP      {{ 'RUNNING' if 'TCPIP' in (started_tasks | map(attribute='job_name') | list) else 'NOT RUNNING' }}
-          RACF       {{ 'RUNNING' if 'RACF' in (started_tasks | map(attribute='job_name') | list) else 'NOT RUNNING' }}
-          PAGENT     {{ 'RUNNING' if 'PAGENT' in (started_tasks | map(attribute='job_name') | list) else 'NOT RUNNING' }}
-          TN3270     {{ 'RUNNING' if 'TN3270' in (started_tasks | map(attribute='job_name') | list) else 'NOT RUNNING' }}
-          SDSF       {{ 'RUNNING' if 'SDSF' in (started_tasks | map(attribute='job_name') | list) else 'NOT RUNNING' }}
-          DBB        {{ 'RUNNING' if 'DBB' in (started_tasks | map(attribute='job_name') | list) else 'NOT RUNNING' }}
-          CICSTS61   {{ 'RUNNING' if 'CICSTS61' in (started_tasks | map(attribute='job_name') | list) else 'NOT RUNNING' }}
+          TCPIP      {{ 'RUNNING' if 'TCPIP' in running_stcs else 'NOT RUNNING' }}
+          RACF       {{ 'RUNNING' if 'RACF' in running_stcs else 'NOT RUNNING' }}
+          PAGENT     {{ 'RUNNING' if 'PAGENT' in running_stcs else 'NOT RUNNING' }}
+          TN3270     {{ 'RUNNING' if 'TN3270' in running_stcs else 'NOT RUNNING' }}
+          SDSF       {{ 'RUNNING' if 'SDSF' in running_stcs else 'NOT RUNNING' }}
+          DBB        {{ 'RUNNING' if 'DBB' in running_stcs else 'NOT RUNNING' }}
+          CICSTS61   {{ 'RUNNING' if 'CICSTS61' in running_stcs else 'NOT RUNNING' }}
 
           STARTED TASKS
           -------------
-          Total Active STCs: {{ started_tasks | map(attribute='job_name') | unique | list | length }}
+          Total Active STCs: {{ running_stcs | length }}
 
-          {{ started_tasks | map(attribute='job_name') | unique | sort | join(', ') }}
+          {{ running_stcs | sort | join(', ') }}
