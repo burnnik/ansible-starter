@@ -1,0 +1,73 @@
+---
+- name: z/OS System Health Dashboard
+  hosts: zos
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+
+    # ----------------------------------------
+    # Get active jobs
+    # ----------------------------------------
+
+    - name: Query all active jobs
+      ibm.ibm_zos_core.zos_job_query:
+      register: active_jobs
+
+    # ----------------------------------------
+    # Filter started tasks
+    # ----------------------------------------
+
+    - name: Keep only started tasks
+      ansible.builtin.set_fact:
+        started_tasks: >-
+          {{
+            active_jobs.jobs
+            | selectattr('job_class', 'defined')
+            | selectattr('job_class', 'equalto', 'STC')
+            | list
+          }}
+
+    - name: Create list of running started tasks
+      ansible.builtin.set_fact:
+        running_stcs: >-
+          {{
+            started_tasks
+            | map(attribute='job_name')
+            | unique
+            | list
+          }}
+
+    # ----------------------------------------
+    # Display dashboard
+    # ----------------------------------------
+
+    - name: Display z/OS health dashboard
+      ansible.builtin.debug:
+        msg: |
+
+          ============================================================
+                         z/OS SYSTEM HEALTH
+          ============================================================
+
+          SYSTEM
+          ------------------------------------------------------------
+          System Name    : ZOSLAB1
+
+          SERVICES
+          ------------------------------------------------------------
+          TCPIP          : {{ 'RUNNING' if 'TCPIP' in running_stcs else 'NOT RUNNING' }}
+          RACF           : {{ 'RUNNING' if 'RACF' in running_stcs else 'NOT RUNNING' }}
+          PAGENT         : {{ 'RUNNING' if 'PAGENT' in running_stcs else 'NOT RUNNING' }}
+          TN3270         : {{ 'RUNNING' if 'TN3270' in running_stcs else 'NOT RUNNING' }}
+          SDSF           : {{ 'RUNNING' if 'SDSF' in running_stcs else 'NOT RUNNING' }}
+          DBB            : {{ 'RUNNING' if 'DBB' in running_stcs else 'NOT RUNNING' }}
+          CICSTS61       : {{ 'RUNNING' if 'CICSTS61' in running_stcs else 'NOT RUNNING' }}
+
+          STARTED TASKS
+          ------------------------------------------------------------
+          Total Active STCs : {{ running_stcs | length }}
+
+          {{ running_stcs | sort | join(', ') }}
+
+          ============================================================
