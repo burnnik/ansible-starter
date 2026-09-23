@@ -7,7 +7,7 @@
   tasks:
 
     - name: Query all active jobs
-      zos_job_query:
+      ibm.ibm_zos_core.zos_job_query:
       register: active_jobs
 
     - name: Keep only started tasks
@@ -23,4 +23,3 @@
     - name: Display result
       debug:
         msg: "{{ started_tasks | map(attribute='job_name') | list }}" 
-        #var: started_tasks
