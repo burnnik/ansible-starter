@@ -10,8 +10,8 @@
         gather_subset:
           - ipl
           - sys
-      register: zos_facts
+      register: sytem_info
    
     - name: Print return information from the previous task
       ansible.builtin.debug:
-        var: zos_facts
+        var: sytem_info
