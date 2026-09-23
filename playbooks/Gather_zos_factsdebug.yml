@@ -1,0 +1,14 @@
+- name: Gather z/OS facts
+  hosts: zos
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Gather all z/OS facts
+      ibm.ibm_zos_core.zos_gather_facts:
+  ibm.ibm_zos_core.zos_gather_facts:
+    gather_subset:
+      - ipl
+      - sys
+    filter:
+      - "*parmlib*"
