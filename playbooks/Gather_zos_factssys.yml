@@ -1,0 +1,9 @@
+- name: Gather z/OS facts
+  hosts: zos
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Return z/OS facts in the systems subset ('sys').
+      ibm.ibm_zos_core.zos_gather_facts:
+      gather_subset: sys
