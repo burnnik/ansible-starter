@@ -1,6 +1,7 @@
 - name: Gather z/OS facts
-  hosts: zoslab
+  hosts: zos
   gather_facts: false
+  environment: "{{ environment_vars }}"
 
   tasks:
     - name: Gather all z/OS facts
