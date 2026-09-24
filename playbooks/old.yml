@@ -1,0 +1,51 @@
+- name: Submit JCL
+  hosts: zos
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  vars:
+    job_owner: GAMA11
+    hlq: PLAT01
+    mlq: DEV
+    libname: JCL
+    primary_allocation: 2
+    secondary_allocation: 4
+    jcl_path: "{{ playbook_dir }}/tmp_jcl/rendered.jcl"
+    jcl_dataset_name: "{{ job_owner }}.TEMP.JCL"
+
+  tasks:
+
+    - name: Render JCL locally on control node
+      ansible.builtin.template:
+        src: templates/provdev.jcl.j2
+        dest: "{{ jcl_path }}"
+      delegate_to: localhost
+
+    - name: Delete a data set if it exists
+      zos_data_set:
+        name: "{{ jcl_dataset_name }}"
+        state: absent
+
+    - name: Create a sequential data set if it does not exist
+      zos_data_set:
+        name: "{{ jcl_dataset_name }}"
+        type: seq
+        state: present
+
+    - name: Copy JCL
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ jcl_path }}"
+        dest: "{{ jcl_dataset_name }}"
+
+    - name: Submit JCL
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ jcl_dataset_name }}"
+        wait_time_s: 60
+        return_output: true
+      register: job_result
+
+    - name: Show job id
+      ansible.builtin.debug:
+        msg: "{{ job_result.jobs[0].job_id }}"
