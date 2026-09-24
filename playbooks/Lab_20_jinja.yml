@@ -18,12 +18,6 @@
         dest: "{{ playbook_dir }}/Hello_JCL.txt"
       delegate_to: localhost
 
-    - name: Create PDS data set
-      zos_data_set:
-        name: "please.dont.make.me.share.my.screen"
-        type: pds
-        state: present
-
     - name: Copy rendered JCL to z/OS
       zos_copy:
         src: "{{ playbook_dir }}/Hello_JCL.txt"
