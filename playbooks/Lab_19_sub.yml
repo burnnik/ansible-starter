@@ -1,0 +1,36 @@
+- name: Submit JCL
+  hosts: zos
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+
+    - name: Create a PDS data set if it does not exist
+      zos_data_set:
+        name: please.dont.make.me.share.my.screen
+        type: pds
+        space_primary: 5
+        space_type: m
+        record_format: fba
+        record_length: 25
+
+    - name: Copy JCL into PDS member
+      zos_copy:
+        src: "{{ playbook_dir }}/Hello_JCL.txt"
+        dest: please.dont.make.me.share.my.screen(HELLO)
+        encoding:
+          from: UTF-8
+          to: IBM-1047
+
+    - name: Submit a PDS job
+      zos_job_submit:
+        src: "please.dont.make.me.share.my.screen(HELLO)"
+        location: DATA_SET
+        wait_time_s: 10
+      register: job_output
+
+    - name: Show job ID
+      ansible.builtin.debug:
+        msg: "{{ job_output.jobs[0].job_id }}"
