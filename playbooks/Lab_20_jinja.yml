@@ -1,0 +1,24 @@
+- name: Submit JCL
+  hosts: zos
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+  vars:
+    job_name: "HELOWRLD" 
+    bye: "hello kendrick!"
+
+  tasks:
+
+    - name: Convert local JCL to IBM-037 and submit the job
+      zos_job_submit:
+        src: "{{ playbook_dir }}/Hello_jcl_jin.txt"
+        location: LOCAL
+        encoding:
+          from: UTF-8
+          to: IBM-1047
+      register: job_output
+
+    - name: Show job ID
+      ansible.builtin.debug:
+        msg: "{{ job_output.jobs[0].job_id }}"

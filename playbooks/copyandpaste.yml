@@ -1,0 +1,5 @@
+- name: Submit a long running PDS job and wait up to 30 seconds for completion.
+  zos_job_submit:
+    src: HLQ.DATA.LLQ(LONGRUN)
+    location: data_set
+    wait_time_s: 30
