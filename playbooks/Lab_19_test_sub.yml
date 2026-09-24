@@ -1,0 +1,25 @@
+```yaml
+---
+- name: Submit JCL
+  hosts: zos
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+
+    - name: Submit a PDS job
+      zos_job_submit:
+        src: "please.dont.make.me.share.my.screen(HELLO)"
+        location: DATA_SET
+        wait_time_s: 10
+      register: job_output
+
+    - name: Display job ID
+      ansible.builtin.debug:
+        msg: "Job ID: {{ job_output.jobs[0].job_id }}"
+
+    - name: Display job output
+      ansible.builtin.debug:
+        var: job_output
