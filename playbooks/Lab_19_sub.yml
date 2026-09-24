@@ -1,3 +1,4 @@
+---
 - name: Submit JCL
   hosts: zos
   gather_facts: false
@@ -11,15 +12,12 @@
       zos_data_set:
         name: please.dont.make.me.share.my.screen
         type: pds
-        space_primary: 5
-        space_type: m
-        record_format: fba
-        record_length: 25
+        state: present
 
     - name: Copy JCL into PDS member
       zos_copy:
         src: "{{ playbook_dir }}/Hello_JCL.txt"
-        dest: please.dont.make.me.share.my.screen(HELLO)
+        dest: "please.dont.make.me.share.my.screen(HELLO)"
         encoding:
           from: UTF-8
           to: IBM-1047
