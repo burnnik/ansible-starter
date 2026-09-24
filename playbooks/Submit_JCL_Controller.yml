@@ -8,8 +8,8 @@
 
   tasks:
 
-  - name: Convert local JCL to IBM-037 and submit the job
-    zos_job_submit:
+    - name: Convert local JCL to IBM-037 and submit the job
+      zos_job_submit:
         src: "{{ playbook_dir }}/Hello_JCL.txt"
         location: LOCAL
         encoding:
@@ -17,6 +17,6 @@
           to: IBM-1047
       register: job_output
 
-  - name: Show job ID
-    ansible.builtin.debug:
+    - name: Show job ID
+      ansible.builtin.debug:
         msg: "{{ job_output.jobs[0].job_id }}"
