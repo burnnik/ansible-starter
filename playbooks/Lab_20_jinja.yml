@@ -1,22 +1,42 @@
+---
 - name: Submit JCL
   hosts: zos
   gather_facts: false
   collections:
     - ibm.ibm_zos_core
   environment: "{{ environment_vars }}"
+
   vars:
-    job_name: "HELOWRLD" 
+    job_name: "HELOWRLD"
     bye: "hello kendrick!"
 
   tasks:
 
-    - name: Convert local JCL to IBM-037 and submit the job
-      zos_job_submit:
-        src: "{{ playbook_dir }}/Hello_jcl_jin.txt"
-        location: LOCAL
+    - name: Render JCL template
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/Hello_jcl_jin.txt"
+        dest: "{{ playbook_dir }}/Hello_JCL.txt"
+      delegate_to: localhost
+
+    - name: Create PDS data set
+      zos_data_set:
+        name: "please.dont.make.me.share.my.screen"
+        type: pds
+        state: present
+
+    - name: Copy rendered JCL to z/OS
+      zos_copy:
+        src: "{{ playbook_dir }}/Hello_JCL.txt"
+        dest: "please.dont.make.me.share.my.screen(HELLO2)"
         encoding:
           from: UTF-8
           to: IBM-1047
+
+    - name: Submit JCL
+      zos_job_submit:
+        src: "please.dont.make.me.share.my.screen(HELLO2)"
+        location: DATA_SET
+        wait_time_s: 30
       register: job_output
 
     - name: Show job ID
