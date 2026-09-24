@@ -46,6 +46,6 @@
       return_output: true
 
   - name: Show job id
-      ansible.builtin.debug:
+    ansible.builtin.debug:
         msg: "{{ job_result.jobs[0].job_id }}"     
 
