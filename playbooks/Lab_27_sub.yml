@@ -1,9 +1,10 @@
 ---
-- name: Create and load KSDS
+- name: Gather z/OS facts
   hosts: zos
   gather_facts: false
   collections:
     - ibm.ibm_zos_core
+    - ansible.builtin
   environment: "{{ environment_vars }}"
 
   vars:
@@ -11,31 +12,41 @@
 
   tasks:
 
-    - name: Delete KSDS if it exists
-      zos_data_set:
-        name: "{{ vsam_name }}"
-        state: absent
+    - name: Delete KSDS
+      ibm.ibm_zos_core.zos_mvs_raw:
+        program_name: IDCAMS
+        auth: true
+        dds:
+          - dd_input:
+              dd_name: SYSIN
+              content: |
+                DELETE {{ vsam_name }}
+          - dd_output:
+              dd_name: SYSPRINT
+              return_content:
+                type: text
+      register: delete_result
+      failed_when: false
 
-    - name: Delete input sequential data set if it exists
-      zos_data_set:
-        name: "{{ vsam_name }}.INPUT"
-        state: absent
+    - name: Show delete result
+      debug:
+        var: delete_result
 
-    - name: Create KSDS
+    - name: Create VSAM KSDS
       zos_data_set:
         name: "{{ vsam_name }}"
         type: ksds
         state: present
         record_format: fb
         record_length: 80
-        key_length: 4
-        key_offset: 0
         space_primary: 2
         space_secondary: 1
         space_type: cyl
+        key_length: 4
+        key_offset: 0
       register: create_ksds_result
 
-    - name: Show KSDS creation result
+    - name: Show job ID and return code
       debug:
         var: create_ksds_result
 
@@ -51,17 +62,13 @@
         space_type: cyl
       register: create_input_result
 
-    - name: Show input data set creation result
-      debug:
-        var: create_input_result
-
-    - name: Copy records to input sequential data set
+    - name: Populate input sequential data set
       zos_copy:
-        src: "{{ playbook_dir }}/KSDS_records.txt"
+        content: |
+          0001TEST RECORD 1
+          0002TEST RECORD 2
         dest: "{{ vsam_name }}.INPUT"
-        encoding:
-          from: UTF-8
-          to: IBM-1047
+        force: true
       register: populate_input_result
 
     - name: Show populate input result
@@ -69,29 +76,23 @@
         var: populate_input_result
 
     - name: Load records into KSDS using IDCAMS REPRO
-      zos_mvs_raw:
+      ibm.ibm_zos_core.zos_mvs_raw:
         program_name: IDCAMS
         auth: true
         dds:
-          - dd_data_set:
-              dd_name: INPUT
-              data_set_name: "{{ vsam_name }}.INPUT"
-              disposition: shr
-
-          - dd_data_set:
-              dd_name: OUTPUT
-              data_set_name: "{{ vsam_name }}"
-              disposition: shr
-
           - dd_input:
               dd_name: SYSIN
               content: |
-                REPRO -
-                  INFILE(INPUT) -
-                  OUTFILE(OUTPUT)
-
+                REPRO INFILE(INDD) OUTDATASET({{ vsam_name }})
+          - dd_data_set:
+              dd_name: INDD
+              data_set_name: "{{ vsam_name }}.INPUT"
           - dd_output:
               dd_name: SYSPRINT
+              return_content:
+                type: text
+          - dd_output:
+              dd_name: SYSOUT
               return_content:
                 type: text
       register: load_ksds_result
