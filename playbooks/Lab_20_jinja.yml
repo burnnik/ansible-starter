@@ -15,7 +15,7 @@
     - name: Render JCL template
       ansible.builtin.template:
         src: "{{ playbook_dir }}/JCL/Hello_jcl_jin.txt"
-        dest: "{{ playbook_dir }}/Hello_JCL.txt"
+        dest: "{{ playbook_dir }}/sample_job.j2"
       delegate_to: localhost
 
     - name: Remove a member from an existing PDS
