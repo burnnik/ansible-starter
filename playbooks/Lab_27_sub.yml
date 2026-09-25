@@ -1,5 +1,5 @@
 ---
-- name: Gather z/OS facts
+- name: Create and load KSDS
   hosts: zos
   gather_facts: false
   collections:
@@ -28,9 +28,19 @@
       register: delete_result
       failed_when: false
 
-    - name: Show delete result
+    - name: Show KSDS delete result
       debug:
         var: delete_result
+
+    - name: Delete input sequential data set
+      zos_data_set:
+        name: "{{ vsam_name }}.INPUT"
+        state: absent
+      register: delete_input_result
+
+    - name: Show input data set delete result
+      debug:
+        var: delete_input_result
 
     - name: Create VSAM KSDS
       zos_data_set:
@@ -46,7 +56,7 @@
         key_offset: 0
       register: create_ksds_result
 
-    - name: Show job ID and return code
+    - name: Show KSDS creation result
       debug:
         var: create_ksds_result
 
@@ -62,13 +72,16 @@
         space_type: cyl
       register: create_input_result
 
+    - name: Show input data set creation result
+      debug:
+        var: create_input_result
+
     - name: Populate input sequential data set
       zos_copy:
         content: |
           0001TEST RECORD 1
           0002TEST RECORD 2
         dest: "{{ vsam_name }}.INPUT"
-        force: true
       register: populate_input_result
 
     - name: Show populate input result
