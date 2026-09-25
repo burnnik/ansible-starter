@@ -14,7 +14,7 @@
 
     - name: Render JCL template
       ansible.builtin.template:
-        src: "{{ playbook_dir }}/templates/Hello_jcl_jin.txt"
+        src: "{{ playbook_dir }}/JCL/Hello_jcl_jin.txt"
         dest: "{{ playbook_dir }}/Hello_JCL.txt"
       delegate_to: localhost
 
