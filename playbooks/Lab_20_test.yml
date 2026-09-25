@@ -2,8 +2,6 @@
 - name: Submit JCL
   hosts: zos
   gather_facts: false
-  collections:
-    - ibm.ibm_zos_core
   environment: "{{ environment_vars }}"
 
   vars:
