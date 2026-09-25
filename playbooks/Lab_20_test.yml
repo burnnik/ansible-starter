@@ -1,0 +1,17 @@
+---
+- name: Submit JCL
+  hosts: zos
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  vars:
+    job_name: "HELOWRLD"
+    bye: "Hello kendrick!"
+    source_jcl: "{{ playbook_dir }}/templates/Hello_jcl_jin.txt"
+    delete_member: "please.dont.make.me.share.my.screen(HELLO2)"
+    submit_member: "please.dont.make.me.share.my.screen(HELLO2)"
+
+  roles:
+    - submit_jcl
