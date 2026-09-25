@@ -22,12 +22,13 @@
         key_length: 4
         key_offset: 0
 
-    - name: Load records into the KSDS
+    - name: Trying to copy a local file to a KSDS data set
       ibm.ibm_zos_core.zos_copy:
-        content: |
-          0001TEST RECORD 1
-          0002TEST RECORD 2
+        src: "{{ playbook_dir }}/INFO/KSDS_records.txt"
         dest: This.is.my.test.ksds
+        encoding:
+          from: UTF-8
+          to: IBM-037
 
     - name: Fetch records from the KSDS
       ibm.ibm_zos_core.zos_fetch:
