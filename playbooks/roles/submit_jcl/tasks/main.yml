@@ -22,7 +22,7 @@
   ibm.ibm_zos_core.zos_job_submit:
     src: "{{ submit_member }}"
     location: DATA_SET
-    wait_time_s: 30
+    wait_time_s: 10
   register: job_output
 
 - name: Show job ID
