@@ -9,12 +9,12 @@
   tasks:
 
     - name: Delete a data set if it exists
-      ibm.ibm_zos_core.zos_data_set:
+      zos_data_set:
         name: This.is.my.test.ksds
         state: absent
 
     - name: Create a KSDS data set if it does not exist
-      ibm.ibm_zos_core.zos_data_set:
+      zos_data_set:
         name: This.is.my.test.ksds
         type: ksds
         state: present
@@ -22,16 +22,16 @@
         key_length: 4
         key_offset: 0
 
-    - name: Trying to copy a local file to a KSDS data set
-      ibm.ibm_zos_core.zos_copy:
+    - name: Load records into the KSDS
+      zos_encode:
         src: "{{ playbook_dir }}/INFO/KSDS_records.txt"
         dest: This.is.my.test.ksds
         encoding:
           from: UTF-8
-          to: IBM-037
+          to: IBM-1047
 
     - name: Fetch records from the KSDS
-      ibm.ibm_zos_core.zos_fetch:
+      zos_fetch:
         src: This.is.my.test.ksds
         dest: "{{ playbook_dir }}/KSDS_records.txt"
         flat: true
