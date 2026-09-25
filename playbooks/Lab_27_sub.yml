@@ -21,7 +21,6 @@
         record_length: 80
         key_length: 4
         key_offset: 0
-        cisize: 4096
 
     - name: Load records into the KSDS
       ibm.ibm_zos_core.zos_copy:
