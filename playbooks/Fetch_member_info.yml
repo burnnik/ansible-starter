@@ -1,0 +1,27 @@
+---
+- name: Get DEFKSDS JCL
+  hosts: zos
+  gather_facts: false
+
+  collections:
+    - ibm.ibm_zos_core
+
+  environment: "{{ environment_vars }}"
+
+  tasks:
+
+    - name: Fetch DEFKSDS member
+      ibm.ibm_zos_core.zos_fetch:
+        src: "ibmuser.jcl(DEFKSDS)"
+        dest: "{{ playbook_dir }}/DEFKSDS.jcl"
+        flat: true
+
+    - name: Display DEFKSDS JCL
+      ansible.builtin.command:
+        cmd: "cat {{ playbook_dir }}/DEFKSDS.jcl"
+      delegate_to: localhost
+      register: jcl_contents
+
+    - name: Show JCL contents
+      ansible.builtin.debug:
+        msg: "{{ jcl_contents.stdout }}"
