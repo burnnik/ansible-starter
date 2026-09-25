@@ -8,7 +8,7 @@
 
   vars:
     job_name: "HELOWRLD"
-    bye: "hello kendrick!"
+    bye: "Hello kendrick!"
 
   tasks:
 
@@ -17,6 +17,12 @@
         src: "{{ playbook_dir }}/templates/Hello_jcl_jin.txt"
         dest: "{{ playbook_dir }}/Hello_JCL.txt"
       delegate_to: localhost
+
+    - name: Remove a member from an existing PDS
+      zos_data_set:
+        name: "please.dont.make.me.share.my.screen(HELLO2)"
+        state: absent
+        type: member
 
     - name: Copy rendered JCL to z/OS
       zos_copy:
