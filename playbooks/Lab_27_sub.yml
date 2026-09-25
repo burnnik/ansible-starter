@@ -22,33 +22,58 @@
         key_length: 4
         key_offset: 0
 
-    - name: Check KSDS records file
-      ansible.builtin.stat:
-        path: "{{ playbook_dir }}/KSDS_records.txt"
-      delegate_to: localhost
-      register: ksds_file
+    - name: Create input sequential data set
+      zos_data_set:
+        name: This.is.my.input.seq
+        type: seq
+        state: present
+        record_format: fb
+        record_length: 80
 
-    - name: Show KSDS records file
-      ansible.builtin.debug:
-        var: ksds_file
-
-    - name: Load records into the KSDS
-      zos_encode:
+    - name: Copy records to input sequential data set
+      zos_copy:
         src: "{{ playbook_dir }}/KSDS_records.txt"
-        dest: This.is.my.test.ksds
+        dest: This.is.my.input.seq
         encoding:
           from: UTF-8
           to: IBM-1047
 
+    - name: Load records into the KSDS
+      zos_mvs_raw:
+        program_name: idcams
+        auth: true
+        dds:
+          - dd_data_set:
+              dd_name: INPUT
+              data_set_name: This.is.my.input.seq
+              disposition: shr
+
+          - dd_data_set:
+              dd_name: OUTPUT
+              data_set_name: This.is.my.test.ksds
+              disposition: shr
+
+          - dd_input:
+              dd_name: SYSIN
+              content: |
+                REPRO -
+                  INFILE(INPUT) -
+                  OUTFILE(OUTPUT)
+
+          - dd_output:
+              dd_name: SYSPRINT
+              return_content:
+                type: text
+
     - name: Fetch records from the KSDS
       zos_fetch:
         src: This.is.my.test.ksds
-        dest: "{{ playbook_dir }}/KSDS_records.txt"
+        dest: "{{ playbook_dir }}/KSDS_records_output.txt"
         flat: true
 
     - name: Read the fetched KSDS
       ansible.builtin.slurp:
-        src: "{{ playbook_dir }}/KSDS_records.txt"
+        src: "{{ playbook_dir }}/KSDS_records_output.txt"
       delegate_to: localhost
       register: ksds_contents
 
