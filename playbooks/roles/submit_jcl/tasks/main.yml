@@ -5,13 +5,13 @@
   delegate_to: localhost
 
 - name: Remove JCL member
-  zos_data_set:
+  ibm.ibm_zos_core.zos_data_set:
     name: "{{ delete_member }}"
     state: absent
     type: member
 
 - name: Copy rendered JCL to z/OS
-  zos_copy:
+  ibm.ibm_zos_core.zos_copy:
     src: "{{ playbook_dir }}/rendered_jcl.txt"
     dest: "{{ submit_member }}"
     encoding:
@@ -19,7 +19,7 @@
       to: IBM-1047
 
 - name: Submit JCL
-  zos_job_submit:
+  ibm.ibm_zos_core.zos_job_submit:
     src: "{{ submit_member }}"
     location: DATA_SET
     wait_time_s: 30
