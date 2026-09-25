@@ -1,21 +1,24 @@
 ---
-- name: Create and verify KSDS
+- name: Create and load KSDS
   hosts: zos
   gather_facts: false
   collections:
     - ibm.ibm_zos_core
   environment: "{{ environment_vars }}"
 
+  vars:
+    vsam_name: GAMA10.VSAM.KSDS
+
   tasks:
 
-    - name: Delete a data set if it exists
+    - name: Delete KSDS if it exists
       zos_data_set:
-        name: This.is.my.test.ksds
+        name: "{{ vsam_name }}"
         state: absent
 
-    - name: Create a KSDS data set if it does not exist
+    - name: Create KSDS
       zos_data_set:
-        name: This.is.my.test.ksds
+        name: "{{ vsam_name }}"
         type: ksds
         state: present
         record_length: 80
@@ -24,7 +27,7 @@
 
     - name: Create input sequential data set
       zos_data_set:
-        name: This.is.my.input.seq
+        name: "{{ vsam_name }}.INPUT"
         type: seq
         state: present
         record_format: fb
@@ -33,24 +36,24 @@
     - name: Copy records to input sequential data set
       zos_copy:
         src: "{{ playbook_dir }}/KSDS_records.txt"
-        dest: This.is.my.input.seq
+        dest: "{{ vsam_name }}.INPUT"
         encoding:
           from: UTF-8
           to: IBM-1047
 
-    - name: Load records into the KSDS
+    - name: Load records into KSDS using IDCAMS REPRO
       zos_mvs_raw:
-        program_name: idcams
+        program_name: IDCAMS
         auth: true
         dds:
           - dd_data_set:
               dd_name: INPUT
-              data_set_name: This.is.my.input.seq
+              data_set_name: "{{ vsam_name }}.INPUT"
               disposition: shr
 
           - dd_data_set:
               dd_name: OUTPUT
-              data_set_name: This.is.my.test.ksds
+              data_set_name: "{{ vsam_name }}"
               disposition: shr
 
           - dd_input:
@@ -65,18 +68,8 @@
               return_content:
                 type: text
 
-    - name: Fetch records from the KSDS
-      zos_fetch:
-        src: This.is.my.test.ksds
-        dest: "{{ playbook_dir }}/KSDS_records_output.txt"
-        flat: true
+      register: load_ksds_result
 
-    - name: Read the fetched KSDS
-      ansible.builtin.slurp:
-        src: "{{ playbook_dir }}/KSDS_records_output.txt"
-      delegate_to: localhost
-      register: ksds_contents
-
-    - name: Print returned information
-      ansible.builtin.debug:
-        msg: "{{ ksds_contents['content'] | b64decode }}"
+    - name: Show load result
+      debug:
+        var: load_ksds_result
