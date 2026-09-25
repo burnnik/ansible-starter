@@ -28,3 +28,4 @@
 - name: Show job ID
   ansible.builtin.debug:
     msg: "{{ job_output.jobs[0].job_id }}"
+
